@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Lines</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script type="text/javascript" src="js/paper-full.min.js"></script>
+    <script type="text/paperscript" canvas="canvas">
+        // Create a Paper.js Path to draw a line into it:
+        //Get the width & height
+        var height = view.size.height * 1.5;
+        var width = view.size.width;
+        var spacing = 10;
+        var numLines = height / spacing;
+        var tilt = 0;
+        var strokeWidth = 3;
+        var strokeColor = "#aaa";
+        var waveHeight = 15;
+        var animationSpeed = 2
+        //Number of points
+        var numPoints = 10;
+        var numPointsAlt = 5;
+
+        function Line(y, t, p) {
+            this.tilt = t;
+            this.yLoc = y;
+            this.numPoints = p;
+            this.path = new Path();
+            this.path.strokeColor = strokeColor;
+            this.path.strokeWidth = strokeWidth;
+            var step = width / (this.numPoints);
+
+            //Add points to the line
+            for (var j = 0; j <= this.numPoints; j++) {
+                this.curveAmount = waveHeight
+                if (j % 2 == 0){
+                    this.curveAmount = waveHeight * -1;
+                }
+                this.path.add(new Point(j * step, yLoc - (tilt + 50) + (this.tilt / this.numPoints * (j+1)) + this.curveAmount));
+            }
+            this.path.smooth();
+        }
+
+        var lines = [];
+        for (var i = 0; i < numLines; i++) {
+            var yLoc = i * spacing;
+            lines.push(new Line(yLoc, 0, numPoints));
+        }
+
+        var altLines = [];
+        for (var i = 0; i < numLines; i++) {
+            var yLoc = i * spacing;
+            altLines.push(new Line(yLoc, tilt, numPointsAlt));
+        }
+
+        // The onFrame function is called up to 60 times a second:
+        function onFrame(event) {
+            // Run through the active layer's children list and change
+            // the position of the placed symbols:
+            /* for (var i = 0; i < numLines; i++) {
+                item = altLines[i].path;
+                //console.log(item);
+                item.position.x += item.bounds.width / 200;
+                if (item.bounds.left > view.size.width) {
+                    item.position.x = -item.bounds.width;
+                }
+            } */
+
+            // Loop through the segments of the path and move them up and down
+            for (var t = 0; t < lines.length; t++) {
+                var line = lines[t];
+                console.log(line);
+                //Loop throught points on the line
+                for (var p = 0; p < line.path.segments.length; p++) {
+
+                    // A cylic value between -1 and 1
+                    var sinus = Math.sin(event.time + (p * animationSpeed));
+
+                    // Change the y position of the segment point:
+                    //console.log(line);
+                    line.path.segments[p].point.y = line.yLoc + (sinus * waveHeight - 100);
+                }
+
+            }
+        }
+
+
+
+    </script>
+</head>
+<body style="background:#ccc">
+    <canvas id="canvas" resize><img width="300" height="300" src="img/logo.png"></canvas>
+</body>
+</html>
