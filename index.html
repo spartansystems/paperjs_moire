@@ -6,21 +6,25 @@
     <link rel="stylesheet" href="css/style.css">
     <script type="text/javascript" src="js/paper-full.min.js"></script>
     <script type="text/paperscript" canvas="canvas">
-        // Create a Paper.js Path to draw a line into it:
-        //Get the width & height
+        // Config Vars
         var height = view.size.height * 1.5;
         var width = view.size.width;
         var spacing = 10;
-        var numLines = height / spacing;
+        // tilt of the alternate lines
         var tilt = 0;
         var strokeWidth = 3;
         var strokeColor = "#aaa";
         var waveHeight = 15;
+        // this number needs some work. It changes the speed but is unreliable (crazy math stuff)
         var animationSpeed = 2
-        //Number of points
+        //number of points on each of the line sets
         var numPoints = 10;
         var numPointsAlt = 5;
 
+        var numLines = height / spacing;
+
+        // Function for creating the lines.
+        // Gets passed the Y Value, tilt (translated to pixels), and number of points
         function Line(y, t, p) {
             this.tilt = t;
             this.yLoc = y;
@@ -33,30 +37,33 @@
             //Add points to the line
             for (var j = 0; j <= this.numPoints; j++) {
                 this.curveAmount = waveHeight
+                //Alternate the wave going up or down every other point
                 if (j % 2 == 0){
                     this.curveAmount = waveHeight * -1;
                 }
                 this.path.add(new Point(j * step, yLoc - (tilt + 50) + (this.tilt / this.numPoints * (j+1)) + this.curveAmount));
             }
+            //smooths the points
             this.path.smooth();
         }
 
+        //create first lines
         var lines = [];
         for (var i = 0; i < numLines; i++) {
             var yLoc = i * spacing;
             lines.push(new Line(yLoc, 0, numPoints));
         }
 
+        //create alternate lines
         var altLines = [];
         for (var i = 0; i < numLines; i++) {
             var yLoc = i * spacing;
             altLines.push(new Line(yLoc, tilt, numPointsAlt));
         }
 
-        // The onFrame function is called up to 60 times a second:
+        // The onFrame function is called up to 60 times a second, it does the animations
         function onFrame(event) {
-            // Run through the active layer's children list and change
-            // the position of the placed symbols:
+            // this moves the alternate lines to the right. Commented out for lack of time to refine.
             /* for (var i = 0; i < numLines; i++) {
                 item = altLines[i].path;
                 //console.log(item);
@@ -66,18 +73,17 @@
                 }
             } */
 
-            // Loop through the segments of the path and move them up and down
+            // Loop through the segments of the paths of the lines objects and move them up and down
             for (var t = 0; t < lines.length; t++) {
                 var line = lines[t];
                 console.log(line);
                 //Loop throught points on the line
                 for (var p = 0; p < line.path.segments.length; p++) {
 
-                    // A cylic value between -1 and 1
+                    // A cylic value between -1 and 1. Crazy math I don't get, but tweaked them enough to look cool.
                     var sinus = Math.sin(event.time + (p * animationSpeed));
 
                     // Change the y position of the segment point:
-                    //console.log(line);
                     line.path.segments[p].point.y = line.yLoc + (sinus * waveHeight - 100);
                 }
 
@@ -89,6 +95,6 @@
     </script>
 </head>
 <body style="background:#ccc">
-    <canvas id="canvas" resize><img width="300" height="300" src="img/logo.png"></canvas>
+    <canvas id="canvas" resize></canvas>
 </body>
 </html>
