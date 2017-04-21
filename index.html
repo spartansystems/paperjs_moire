@@ -87,17 +87,22 @@
                     // Change the y position of the segment point:
                     line.path.segments[p].point.y = line.yLoc + (sinus * waveHeight - 100);
                 }
-
             }
         }
 
+        function resize(canvas, w, h, s) {
+          paper.view.viewSize.width = w;
+          paper.view.viewSize.height = h;
+          l.scale(s/scale, [0, 0]);
+          scale = s;
+        }
 
 
     </script>
 </head>
-<body style="background:#ccc">
+<body>
     <div class="background">
-        <canvas id="canvas" resize></canvas>
+        <canvas id="canvas" resize="true"></canvas>
     </div>
 </body>
 </html>
