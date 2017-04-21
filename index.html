@@ -9,26 +9,28 @@
         // Config Vars
         var height = view.size.height * 1.5;
         var width = view.size.width;
-        var spacing = 10;
+        var spacing = 5;
         // tilt of the alternate lines
-        var tilt = 0;
-        var strokeWidth = 3;
-        var strokeColor = "#aaa";
-        var waveHeight = 15;
+        var tilt = 10;
+        var strokeWidth = 1;
+        var strokeColor = "#222";
+        var waveHeight = 2
+        var waveHeight2 = 0;
         // this number needs some work. It changes the speed but is unreliable (crazy math stuff)
-        var animationSpeed = 2
+        var animationSpeed = 4
         //number of points on each of the line sets
-        var numPoints = 10;
-        var numPointsAlt = 5;
+        var numPoints = 2;
+        var numPointsAlt = 1;
 
         var numLines = height / spacing;
 
         // Function for creating the lines.
         // Gets passed the Y Value, tilt (translated to pixels), and number of points
-        function Line(y, t, p) {
+        function Line(y, t, p, h) {
             this.tilt = t;
             this.yLoc = y;
             this.numPoints = p;
+            //this.theHeight = h;
             this.path = new Path();
             this.path.strokeColor = strokeColor;
             this.path.strokeWidth = strokeWidth;
@@ -36,10 +38,10 @@
 
             //Add points to the line
             for (var j = 0; j <= this.numPoints; j++) {
-                this.curveAmount = waveHeight
+                this.curveAmount = h;
                 //Alternate the wave going up or down every other point
                 if (j % 2 == 0){
-                    this.curveAmount = waveHeight * -1;
+                    this.curveAmount = h * -1;
                 }
                 this.path.add(new Point(j * step, yLoc - (tilt + 50) + (this.tilt / this.numPoints * (j+1)) + this.curveAmount));
             }
@@ -51,14 +53,14 @@
         var lines = [];
         for (var i = 0; i < numLines; i++) {
             var yLoc = i * spacing;
-            lines.push(new Line(yLoc, 0, numPoints));
+            lines.push(new Line(yLoc, 0, numPoints, waveHeight));
         }
 
         //create alternate lines
         var altLines = [];
         for (var i = 0; i < numLines; i++) {
             var yLoc = i * spacing;
-            altLines.push(new Line(yLoc, tilt, numPointsAlt));
+            altLines.push(new Line(yLoc, tilt, numPointsAlt, waveHeight2));
         }
 
         // The onFrame function is called up to 60 times a second, it does the animations
@@ -95,6 +97,8 @@
     </script>
 </head>
 <body style="background:#ccc">
-    <canvas id="canvas" resize></canvas>
+    <div class="background">
+        <canvas id="canvas" resize></canvas>
+    </div>
 </body>
 </html>
