@@ -89,11 +89,14 @@
                 }
             }
         }
+        function redraw() {
+          console.log("resizin'");
+        }
+        window.addEventListener("resize", redraw);
 
         function resize(canvas, w, h, s) {
           paper.view.viewSize.width = w;
           paper.view.viewSize.height = h;
-          l.scale(s/scale, [0, 0]);
           scale = s;
         }
 
