@@ -11,16 +11,16 @@
         var width = view.size.width;
         var spacing = 3;
         // tilt of the alternate lines
-        var tilt = -20;
-        var strokeWidth = .5;
-        var strokeColor = "#666";
-        var waveHeight = 25;
-        var waveHeight2 = 50;
+        var tilt = -25;
+        var strokeWidth = .25;
+        var strokeColor = "#333";
+        var waveHeight = 20;
+        var waveHeight2 = 25;
         // this number needs some work. It changes the speed but is unreliable (crazy math stuff)
-        var animationSpeed = 10000
+        var animationSpeed = 10
         //number of points on each of the line sets
         var numPoints = 2;
-        var numPointsAlt = .25;
+        var numPointsAlt = 0;
 
         var numLines = height / spacing;
 
@@ -78,7 +78,6 @@
             // Loop through the segments of the paths of the lines objects and move them up and down
             for (var t = 0; t < lines.length; t++) {
                 var line = lines[t];
-                console.log(line);
                 //Loop throught points on the line
                 for (var p = 0; p < line.path.segments.length; p++) {
 
