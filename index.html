@@ -1,94 +1,146 @@
 <!DOCTYPE html>
 <html>
-<head>
+  <head>
     <meta charset="UTF-8">
     <title>Lines</title>
     <link rel="stylesheet" href="css/style.css">
     <script type="text/javascript" src="js/paper-full.min.js"></script>
     <script type="text/paperscript" canvas="canvas">
-        // Config Vars
-        var spacing = 3;
-        // tilt of the alternate lines
-        var tilt = -25;
-        var strokeWidth = .25;
-        var strokeColor = "#333";
-        var waveHeight = 20;
-        var waveHeight2 = 25;
-        // this number needs some work. It changes the speed but is unreliable (crazy math stuff)
-        var animationSpeed = 10
-        //number of points on each of the line sets
-        var numPoints = 2;
-        var numPointsAlt = 0;
-
-        // Function for creating the lines.
-        // Gets passed the Y Value, tilt (translated to pixels), and number of points
-        function Line(y, t, p, h, w) {
-            this.tilt = t;
-            this.yLoc = y;
-            this.numPoints = p;
-            this.width = w;
-            //this.theHeight = h;
-            this.path = new Path();
-            this.path.strokeColor = strokeColor;
-            this.path.strokeWidth = strokeWidth;
-            var step = this.width / (this.numPoints);
-
-            //Add points to the line
-            for (var j = 0; j <= this.numPoints; j++) {
-                this.curveAmount = h;
-                //Alternate the wave going up or down every other point
-                if (j % 2 == 0){
-                    this.curveAmount = h * -1;
-                }
-                this.path.add(new Point(j * step, this.yLoc - (tilt + 50) + (this.tilt / this.numPoints * (j+1)) + this.curveAmount));
-            }
-            //smooths the points
-            this.path.smooth();
-            // Add the line to the group
-            group.addChild(this.path);
-        }
-        var lines = [];
-        var group = new Group();
-        //create lines
-        function drawLines(event){
-          console.log("erasing that SHIT")
-          group.removeChildren();
-          console.log("draw lines");
-          var height = view.size.height * 1.5;
-          var width = view.size.width;
-          var numLines = height / spacing;
-          //var lines = [];
-          for (var i = 0; i < numLines; i++) {
-              var yLoc = i * spacing;
-              lines.push(new Line(yLoc, 0, numPoints, waveHeight, width));
-          }
-        }
-        // The onFrame function is called up to 60 times a second, it does the animations
-        function onFrame(event) {
-          if (lines) {
-            // Loop through the segments of the paths of the lines objects and move them up and down
-            for (var t = 0; t < lines.length; t++) {
-              var line = lines[t];
-              //Loop throught points on the line
-              for (var p = 0; p < line.path.segments.length; p++) {
-
-                // A cylic value between -1 and 1. Crazy math I don't get, but tweaked them enough to look cool.
-                var sinus = Math.sin(event.time + (p * animationSpeed));
-
-                // Change the y position of the segment point:
-                line.path.segments[p].point.y = line.yLoc + (sinus * waveHeight - 100);
-              }
-            }
-          }
-        }
-        window.addEventListener("resize", drawLines);
-        drawLines();
+    // Config Vars
+    var spacing = 7;
+    // tilt of the alternate lines
+    var tilt = 0;
+    var strokeWidth = 1;
+    var strokeColor = "#1a1a1a";
+    var waveHeight = 12;
+    var waveHeight2 = 0;
+    // this number needs some work. It changes the speed but is unreliable (crazy math stuff)
+    var animationSpeed = .25
+    var animationSpeedAlt = 1
+    //number of points on each of the line sets
+    var numPoints = 16;
+    var numPointsAlt = 3;
+    //Set's the rotation of the layers (0 means no rotation)
+    var rotation = 0;
+    var rotationAlt = 0;
+    //show the alternate lines or not
+    var showAltLines = false;
+    var smoothLines = true;
+    /*********************************************************************************************************/
+    /*********************************************************************************************************/
+    /*********************************************************************************************************/
+    /*********************************************************************************************************/
+    /*********************************************************************************************************/
+    // Function for creating the lines.
+    // Gets passed the Y Value, tilt (translated to pixels), and number of points
+    function Line(y, t, p, h, w, g) {
+    this.tilt = t;
+    this.yLoc = y;
+    this.numPoints = p;
+    this.width = w;
+    this.group = g;
+    //this.theHeight = h;
+    this.path = new Path();
+    this.path.strokeColor = strokeColor;
+    this.path.strokeWidth = strokeWidth;
+    var step = this.width / (this.numPoints);
+    //Add points to the line
+    for (var j = 0; j <= this.numPoints; j++) {
+    this.curveAmount = h;
+    //Alternate the wave going up or down every other point
+    if (j % 2 == 0){
+    this.curveAmount = h * -1;
+    }
+    this.path.add(new Point((j * step)-300, this.yLoc + (this.tilt / this.numPoints * (j+1)) + this.curveAmount));
+    }
+    //smooths the points
+    if (smoothLines){
+      this.path.smooth();
+    }
+    // Add the line to the group
+    if (this.group == 1){
+    group.addChild(this.path);
+    }else{
+    this.path.smooth();
+    groupAlt.addChild(this.path);
+    }
+    }
+    var lines = [];
+    var altLines = [];
+    var group = new Group();
+    var groupAlt = new Group();
+    var layer1 = new Layer();
+    var layer2 = new Layer();
+    layer1.transformContent = false;
+    layer1.addChild(group);
+    layer2.transformContent = false;
+    layer2.addChild(groupAlt);
+    //create lines
+    function drawLines(event){
+    group.removeChildren();
+    groupAlt.removeChildren();
+    console.log("draw lines");
+    var height = view.size.height * 2.5;
+    var width = (view.size.width)+400;
+    var numLines = height / spacing;
+    //create lines
+    for (var i = 0; i < numLines; i++) {
+    var yLoc = i * spacing;
+    lines.push(new Line(yLoc, 0, numPoints, waveHeight, width, 1));
+    }
+    if (showAltLines) {
+    for (var i = 0; i < numLines; i++) {
+    var yLoc = i * spacing;
+    altLines.push(new Line(yLoc, 0, numPointsAlt, waveHeight2, width, 2));
+    }
+    }
+    }
+    // The onFrame function is called up to 60 times a second, it does the animations
+    function onFrame(event) {
+    if (lines) {
+    // Loop through the segments of the paths of the lines objects and move them up and down
+    for (var t = 0; t < lines.length; t++) {
+    var line = lines[t];
+    //Loop throught points on the line
+    for (var p = 0; p < line.path.segments.length; p++) {
+    // A cylic value between -1 and 1. Crazy math I don't get, but tweaked them enough to look cool.
+    var sinus = Math.sin(event.time * animationSpeed + p*10);
+    // Change the y position of the segment point:
+    line.path.segments[p].point.y = line.yLoc + (sinus * waveHeight -400);
+    }
+    }
+    }
+    if (showAltLines) {
+    //console.log("trying to animate");
+    // Loop through the segments of the paths of the lines objects and move them up and down
+    for (var t = 0; t < altLines.length; t++) {
+    var line = altLines[t];
+    //Loop throught points on the line
+    for (var p = 0; p < line.path.segments.length; p++) {
+    // A cylic value between -1 and 1. Crazy math I don't get, but tweaked them enough to look cool.
+    var sinus = Math.sin(event.time * animationSpeedAlt + p);
+    // Change the y position of the segment point:
+    line.path.segments[p].point.y = line.yLoc + (sinus * waveHeight2 -400);
+    }
+    }
+    }
+    //Rotate the Layers
+    if (rotation !== 0){
+    //console.log(layer1);
+    layer1.rotate(rotation, view.center);
+    }
+    if (rotationAlt !== 0){
+    layer2.rotate(rotationAlt, view.center);
+    }
+    }
+    window.addEventListener("resize", drawLines);
+    drawLines();
     </script>
-</head>
-<body>
-  <div class="background">
+  </head>
+  <body>
+    <div class="container">
+      <div class="background"></div>
       <canvas id="canvas" resize="true"></canvas>
-  </div>
-
-</body>
-</html>
+    </div>
+  </body>
+  </html>
